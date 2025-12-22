@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #fff5e6 0%, #ffe0b3 100%);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 4px 0 12px rgba(255, 140, 0, 0.1);
+            padding: 32px 24px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ff8c00;
+            margin-bottom: 48px;
+            letter-spacing: -0.5px;
+        }
+
+        .game-item {
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            color: #666;
+            border: 2px solid transparent;
+        }
+
+        .game-item:hover {
+            background: #fff5e6;
+            color: #ff8c00;
+        }
+
+        .game-item.active {
+            background: linear-gradient(135deg, #ff8c00 0%, #ff6b00 100%);
+            color: white;
+            border-color: #ff8c00;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 48px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 8px 32px rgba(255, 140, 0, 0.15);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .game-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .game-subtitle {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 32px auto;
+            max-width: 360px;
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            background: #f8f8f8;
+            border: 3px solid #e0e0e0;
+            border-radius: 16px;
+            font-size: 48px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #333;
+        }
+
+        .cell:hover:not(.taken) {
+            background: #fff5e6;
+            border-color: #ff8c00;
+            transform: scale(1.05);
+        }
+
+        .cell.taken {
+            cursor: not-allowed;
+        }
+
+        .status {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 24px;
+            min-height: 28px;
+        }
+
+        .reset-btn {
+            display: block;
+            margin: 0 auto;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #ff8c00 0%, #ff6b00 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+        }
+
+        .reset-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .lang-selector {
+            position: absolute;
+            top: 24px;
+            right: 32px;
+            display: flex;
+            gap: 8px;
+            background: white;
+            padding: 8px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid transparent;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .lang-btn.active {
+            background: #ff8c00;
+            color: white;
+            border-color: #ff8c00;
+        }
+
+        .trivia-container {
+            display: none;
+        }
+
+        .trivia-container.active {
+            display: block;
+        }
+
+        .question-box {
+            padding: 32px;
+            bottom-margin: 8px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .answer-btn {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            margin-bottom: 12px;
+            background: #f8f8f8;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #333;
+        }
+
+        .answer-btn:hover:not(:disabled) {
+            background: #fff5e6;
+            border-color: #ff8c00;
+        }
+
+        .answer-btn.correct {
+            background: #4caf50;
+            border-color: #4caf50;
+            color: white;
+        }
+
+        .answer-btn.wrong {
+            background: #f44336;
+            border-color: #f44336;
+            color: white;
+        }
+
+        .answer-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .score {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #ff8c00;
+            margin-bottom: 24px;
+        }
+
+        .score-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 24px;
+        }
+
+        .score-box {
+            text-align: center;
+            padding: 16px 24px;
+            background: #f8f8f8;
+            border-radius: 12px;
+            border: 3px solid #e0e0e0;
+        }
+
+        .score-box.player {
+            border-color: #4caf50;
+        }
+
+        .score-box.ai {
+            border-color: #ff8c00;
+        }
+
+        .score-label {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+
+        .score-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .round-info {
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .explanation-box {
+    background: #fff5e6;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #333;
+}
+
+.explanation-box strong {
+    color: #ff8c00;
+    display: block;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff8c00;
+            animation: confetti-fall 3s ease-out forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .win-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: white;
+            padding: 48px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            text-align: center;
+            animation: modal-pop 0.5s ease-out forwards;
+        }
+
+        @keyframes modal-pop {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .win-modal h2 {
+            font-size: 48px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ff8c00 0%, #ff6b00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .win-modal p {
+            font-size: 20px;
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .lose-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: white;
+            padding: 48px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            text-align: center;
+            animation: modal-shake 0.5s ease-out forwards;
+        }
+
+        @keyframes modal-shake {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            10%, 30%, 50%, 70%, 90% {
+                transform: translate(-48%, -50%) scale(1);
+            }
+            20%, 40%, 60%, 80% {
+                transform: translate(-52%, -50%) scale(1);
+            }
+        }
+
+        .lose-modal h2 {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #666;
+        }
+
+        .lose-modal p {
+            font-size: 20px;
+            color: #999;
+            margin-bottom: 24px;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            animation: fade-in 0.3s ease-out forwards;
+        }
+
+        @keyframes fade-in {
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">Ernie GameHub</div>
+        <div class="game-item active" data-game="tictactoe">
+            <span class="game-name">Tic Tac Toe</span>
+        </div>
+        <div class="game-item" data-game="trivia">
+            <span class="game-name">Two Truths One Lie</span>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="lang-selector">
+            <button class="lang-btn active" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="tr">TR</button>
+            <button class="lang-btn" data-lang="zh">中文</button>
+        </div>
+
+        <div class="game-container">
+            <div id="tictactoe" class="tictactoe-container">
+                <div class="game-header">
+                    <h1 class="game-title">Tic Tac Toe</h1>
+                    <p class="game-subtitle">Play against AI</p>
+                </div>
+                <div class="status">Your turn</div>
+                <div class="board">
+                    <div class="cell" data-index="0"></div>
+                    <div class="cell" data-index="1"></div>
+                    <div class="cell" data-index="2"></div>
+                    <div class="cell" data-index="3"></div>
+                    <div class="cell" data-index="4"></div>
+                    <div class="cell" data-index="5"></div>
+                    <div class="cell" data-index="6"></div>
+                    <div class="cell" data-index="7"></div>
+                    <div class="cell" data-index="8"></div>
+                </div>
+                <button class="reset-btn">New Game</button>
+            </div>
+
+            <div id="trivia" class="trivia-container">
+                <div class="game-header">
+                    <h1 class="game-title">Two Truths One Lie</h1>
+                    <p class="game-subtitle">Find the false statement</p>
+                </div>
+                <div class="round-info">Round <span id="current-round">1</span> / 5</div>
+                <div class="score-container">
+                    <div class="score-box player">
+                        <div class="score-label">You</div>
+                        <div class="score-value" id="player-score">0</div>
+                    </div>
+                    <div class="score-box ai">
+                        <div class="score-label">AI</div>
+                        <div class="score-value" id="ai-score">0</div>
+                    </div>
+                </div>
+                <div class="question-box" id="question">Loading...</div>
+
+                <button class="answer-btn" data-answer="0"></button>
+                <button class="answer-btn" data-answer="1"></button>
+                <button class="answer-btn" data-answer="2"></button>
+                <div class="explanation-box" id="explanation" style="display: none;"></div>
+                <button class="reset-btn" id="next-question">Next Round</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let startingPlayer = 'X';
+
+        const translations = {
+            en: {
+                tictactoe: 'Tic Tac Toe',
+                trivia: 'Two Truths One Lie',
+                playAgainstAI: 'Play against AI',
+                findFalse: 'Find the false statement',
+                yourTurn: 'Your turn',
+                aiThinking: 'Ernie is thinking...',
+                youWin: 'You win!',
+                aiWins: 'Ernie wins!',
+                draw: 'Draw!',
+                newGame: 'New Game',
+                score: 'Score',
+                nextQuestion: 'Next Question',
+                nextRound: 'Next Round',
+                loading: 'Loading...',
+                whichFalse: 'Which statement is false?',
+                round: 'Round',
+                you: 'You',
+                ai: 'AI',
+                gameOver: 'Game Over!',
+                finalScore: 'Final Score',
+                playAgain: 'Play Again'
+            },
+            tr: {
+                tictactoe: 'Tic Tac Toe',
+                trivia: '2 Doğru 1 Yanlış',
+                playAgainstAI: 'Yapay zeka ile oyna',
+                findFalse: 'Yanlış ifadeyi bul',
+                yourTurn: 'Senin sıran',
+                aiThinking: 'Ernie düşünüyor...',
+                youWin: 'Kazandın!',
+                aiWins: 'Ernie kazandı!',
+                draw: 'Berabere!',
+                newGame: 'Yeni Oyun',
+                score: 'Skor',
+                nextQuestion: 'Sonraki Soru',
+                nextRound: 'Sonraki Tur',
+                loading: 'Yükleniyor...',
+                whichFalse: 'Hangi ifade yanlış?',
+                round: 'Tur',
+                you: 'Sen',
+                ai: 'AI',
+                gameOver: 'Oyun Bitti!',
+                finalScore: 'Final Skoru',
+                playAgain: 'Tekrar Oyna'
+            },
+            zh: {
+                tictactoe: '井字棋',
+                trivia: '两真一假',
+                playAgainstAI: '与Ernie对战',
+                findFalse: '找出错误的陈述',
+                yourTurn: '你的回合',
+                aiThinking: 'Ernie思考中...',
+                youWin: '你赢了！',
+                aiWins: 'Ernie赢了！',
+                draw: '平局！',
+                newGame: '新游戏',
+                score: '分数',
+                nextQuestion: '下一题',
+                nextRound: '下一轮',
+                loading: '加载中...',
+                whichFalse: '哪个陈述是错误的？',
+                round: '回合',
+                you: '你',
+                ai: 'AI',
+                gameOver: '游戏结束！',
+                finalScore: '最终得分',
+                playAgain: '再玩一次'
+            }
+        };
+
+        let currentLang = 'en';
+        let board = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '];
+        let gameActive = true;
+        let playerScore = 0;
+        let aiScore = 0;
+        let currentRound = 1;
+        let maxRounds = 5;
+
+        function updateLanguage() {
+            const t = translations[currentLang];
+            document.querySelectorAll('.game-name')[0].textContent = t.tictactoe;
+            document.querySelectorAll('.game-name')[1].textContent = t.trivia;
+            document.querySelector('#tictactoe .game-title').textContent = t.tictactoe;
+            document.querySelector('#tictactoe .game-subtitle').textContent = t.playAgainstAI;
+            document.querySelector('#trivia .game-title').textContent = t.trivia;
+            document.querySelector('#trivia .game-subtitle').textContent = t.findFalse;
+            document.querySelector('#tictactoe .reset-btn').textContent = t.newGame;
+            document.querySelector('#next-question').textContent = t.nextQuestion;
+
+            if (gameActive) {
+                document.querySelector('.status').textContent = t.yourTurn;
+            }
+        }
+
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentLang = btn.dataset.lang;
+                updateLanguage();
+            });
+        });
+
+        document.querySelectorAll('.game-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.game-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+
+                const game = item.dataset.game;
+                if (game === 'tictactoe') {
+                    document.getElementById('tictactoe').style.display = 'block';
+                    document.getElementById('trivia').classList.remove('active');
+                } else {
+                    document.getElementById('tictactoe').style.display = 'none';
+                    document.getElementById('trivia').classList.add('active');
+                    resetTriviaGame();
+                    loadTriviaQuestion();
+                }
+            });
+        });
+
+        function checkWinner(b, p) {
+            const wins = [
+                [0,1,2],[3,4,5],[6,7,8],
+                [0,3,6],[1,4,7],[2,5,8],
+                [0,4,8],[2,4,6]
+            ];
+            return wins.some(([a,b_,c]) => b[a]===p && b[b_]===p && b[c]===p);
+        }
+
+        function boardFull() {
+            return board.every(cell => cell !== ' ');
+        }
+
+        async function aiMove() {
+            const t = translations[currentLang];
+            document.querySelector('.status').textContent = t.aiThinking;
+
+            const resetBtn = document.querySelector('#tictactoe .reset-btn');
+            resetBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/ai-move`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ board: board })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    board = data.board;
+                    document.querySelector(`.cell[data-index="${data.move}"]`).textContent = 'O';
+                    document.querySelector(`.cell[data-index="${data.move}"]`).classList.add('taken');
+
+                    if (data.winner === 'O') {
+                        document.querySelector('.status').textContent = t.aiWins;
+                        gameActive = false;
+                        showLoseModal(t.aiWins, t.newGame);
+                    } else if (data.winner === 'draw') {
+                        document.querySelector('.status').textContent = t.draw;
+                        gameActive = false;
+                    } else {
+                        document.querySelector('.status').textContent = t.yourTurn;
+                    }
+                } else {
+                    console.error('AI move failed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                resetBtn.disabled = false;
+            }
+        }
+
+        document.querySelectorAll('.cell').forEach(cell => {
+            cell.addEventListener('click', async () => {
+                const t = translations[currentLang];
+                const index = parseInt(cell.dataset.index);
+
+                if (board[index] === ' ' && gameActive) {
+                    board[index] = 'X';
+                    cell.textContent = 'X';
+                    cell.classList.add('taken');
+
+                    if (checkWinner(board, 'X')) {
+                        document.querySelector('.status').textContent = t.youWin;
+                        gameActive = false;
+                        showWinModal(t.youWin, t.newGame);
+                        return;
+                    }
+
+                    if (boardFull()) {
+                        document.querySelector('.status').textContent = t.draw;
+                        gameActive = false;
+                        return;
+                    }
+
+                    await aiMove();
+                }
+            });
+        });
+
+        document.querySelector('#tictactoe .reset-btn').addEventListener('click', () => {
+    board = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '];
+    gameActive = true;
+
+    document.querySelectorAll('.cell').forEach(cell => {
+        cell.textContent = '';
+        cell.classList.remove('taken');
+    });
+
+
+    startingPlayer = startingPlayer === 'X' ? 'O' : 'X';
+
+    if (startingPlayer === 'X') {
+        document.querySelector('.status').textContent = translations[currentLang].yourTurn;
+    } else {
+        document.querySelector('.status').textContent = translations[currentLang].aiThinking;
+
+        setTimeout(aiMove, 400);
+    }
+});
+
+
+        async function loadTriviaQuestion() {
+    const t = translations[currentLang];
+    document.getElementById('question').textContent = "Ernie is generating statements...";
+    document.getElementById('explanation').style.display = 'none';
+
+    const answerBtns = document.querySelectorAll('.answer-btn');
+    answerBtns.forEach(btn => {
+        btn.textContent = '';
+        btn.disabled = true;
+        btn.classList.remove('correct', 'wrong');
+    });
+
+    const nextBtn = document.getElementById('next-question');
+    nextBtn.disabled = true;
+
+    try {
+        const response = await fetch(`${API_BASE}/trivia`);
+        const data = await response.json();
+
+        if (data.statements) {
+            document.getElementById('question').textContent = t.whichFalse;
+
+            answerBtns.forEach((btn, idx) => {
+                btn.textContent = data.statements[idx];
+                btn.disabled = false;
+                btn.onclick = () => checkAnswer(idx, data.lie, data.explanation); // explanation ekledik
+            });
+        } else {
+            document.getElementById('question').textContent = 'Error loading question';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('question').textContent = 'Error loading question';
+    } finally {
+        nextBtn.disabled = false;
+    }
+}
+
+        function checkAnswer(selected, correct, explanation) {
+    const t = translations[currentLang];
+    const buttons = document.querySelectorAll('.answer-btn');
+
+    buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+
+        if (idx === correct) {
+            btn.classList.add('wrong');
+        } else {
+            btn.classList.add('correct');
+        }
+    });
+
+
+    const explanationBox = document.getElementById('explanation');
+    explanationBox.innerHTML = `<strong>Explanation:</strong> ${explanation || 'No explanation available.'}`;
+    explanationBox.style.display = 'block';
+
+    if (selected === correct) {
+        playerScore++;
+        document.getElementById('player-score').textContent = playerScore;
+    } else {
+        aiScore++;
+        document.getElementById('ai-score').textContent = aiScore;
+    }
+
+    if (currentRound >= maxRounds) {
+        setTimeout(() => {
+            if (playerScore > aiScore) {
+                showWinModal(t.youWin, `${t.finalScore}: ${playerScore} - ${aiScore}`, t.playAgain);
+            } else if (aiScore > playerScore) {
+                showLoseModal(t.aiWins, `${t.finalScore}: ${playerScore} - ${aiScore}`, t.playAgain);
+            } else {
+                showDrawModal(t.draw, `${t.finalScore}: ${playerScore} - ${aiScore}`, t.playAgain);
+            }
+        }, 1500);
+    }
+}
+
+        document.getElementById('next-question').addEventListener('click', () => {
+            if (currentRound >= maxRounds) {
+                resetTriviaGame();
+            } else {
+                currentRound++;
+                document.getElementById('current-round').textContent = currentRound;
+                loadTriviaQuestion();
+            }
+            updateLanguage();
+        });
+
+        function resetTriviaGame() {
+            currentRound = 1;
+            playerScore = 0;
+            aiScore = 0;
+            document.getElementById('current-round').textContent = currentRound;
+            document.getElementById('player-score').textContent = playerScore;
+            document.getElementById('ai-score').textContent = aiScore;
+            loadTriviaQuestion();
+        }
+
+        function createConfetti() {
+            const colors = ['#ff8c00', '#ff6b00', '#ffa500', '#ffb347', '#ffd700'];
+            const celebration = document.createElement('div');
+            celebration.className = 'celebration';
+
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                celebration.appendChild(confetti);
+            }
+
+            document.body.appendChild(celebration);
+            setTimeout(() => celebration.remove(), 3000);
+        }
+
+        function showWinModal(title, message, btnText) {
+            createConfetti();
+
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop';
+
+            const modal = document.createElement('div');
+            modal.className = 'win-modal';
+            modal.innerHTML = `
+                <h2>${title}</h2>
+                <button class="reset-btn" onclick="closeModal()">New Game</button>
+            `;
+
+            document.body.appendChild(backdrop);
+            document.body.appendChild(modal);
+        }
+
+        function showLoseModal(title, message, btnText) {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop';
+
+            const modal = document.createElement('div');
+            modal.className = 'lose-modal';
+            modal.innerHTML = `
+                <h2>${title}</h2>
+                <button class="reset-btn" onclick="closeModal()">New Game</button>
+            `;
+
+            document.body.appendChild(backdrop);
+            document.body.appendChild(modal);
+        }
+
+        function showDrawModal(title, message, btnText) {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop';
+
+            const modal = document.createElement('div');
+            modal.className = 'win-modal';
+            modal.innerHTML = `
+                <h2>${title}</h2>
+                <p>${message}</p>
+                <button class="reset-btn" onclick="closeModal()">${btnText}</button>
+            `;
+
+            document.body.appendChild(backdrop);
+            document.body.appendChild(modal);
+        }
+
+        function closeModal() {
+            const activeGame = document.querySelector('.game-item.active').dataset.game;
+            document.querySelectorAll('.modal-backdrop, .win-modal, .lose-modal').forEach(el => el.remove());
+
+            if (activeGame === 'tictactoe') {
+                board = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '];
+                gameActive = true;
+                document.querySelectorAll('.cell').forEach(cell => {
+                    cell.textContent = '';
+                    cell.classList.remove('taken');
+                });
+                document.querySelector('.status').textContent = translations[currentLang].yourTurn;
+            } else {
+                resetTriviaGame();
+            }
+        }
+
+    </script>
+</body>
+</html>
