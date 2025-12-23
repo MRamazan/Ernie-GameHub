@@ -713,6 +713,24 @@
                 opacity: 1;
             }
         }
+        /* PAGE VISIBILITY FIX */
+
+.main-page-container,
+.tictactoe-container,
+.trivia-container,
+.roleplay-container,
+.about-container {
+    display: none;
+}
+
+.main-page-container.active,
+.tictactoe-container.active,
+.trivia-container.active,
+.roleplay-container.active,
+.about-container.active {
+    display: block;
+}
+
     </style>
 </head>
 <body>
@@ -850,20 +868,20 @@
                         This project was created for the <strong>Ernie AI Developer Challenge</strong> hackathon, showcasing the capabilities of Ernie AI in creating engaging and interactive gaming experiences.
                     </p>
                     <p style="margin-bottom: 20px;">
+I used the ultra-lightweight Simple ERNIE Bot through the Gradio API (https://huggingface.co/spaces/baidu/simple_ernie_bot_demo
+).
+The model is not designed for performance or production use and serves only as a basic demo for testing purposes. Therefore, its performance may not be perfect, but it is sufficient for demonstrating the game concept and minigame integration.                    </p>
+                    <p style="margin-bottom: 20px;">
                         <a href="https://baiduernieai.devpost.com" target="_blank" class="about-link">
-                            🏆 View Hackathon Details
+                            View Hackathon Details
                         </a>
                     </p>
                 </div>
                 <div class="contact-section">
                     <h3 class="contact-title">Get in Touch</h3>
                     <div class="contact-item">
-                        <strong>GitHub:</strong>
-                        <a href="https://github.com/yourusername" target="_blank">github.com/yourusername</a>
-                    </div>
-                    <div class="contact-item">
-                        <strong>Email:</strong>
-                        <a href="mailto:your.email@gmail.com">your.email@gmail.com</a>
+                        <strong>GitHub Repo:</strong>
+                        <a href="https://github.com/MRamazan/Ernie-GameHub" target="_blank">https://github.com/MRamazan/Ernie-GameHub</a>
                     </div>
                 </div>
             </div>
@@ -1060,38 +1078,38 @@
             });
         });
 
-        document.querySelectorAll('.game-item').forEach(item => {
-            item.addEventListener('click', () => {
-                document.querySelectorAll('.game-item').forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
+        const pages = ['main', 'tictactoe', 'trivia', 'roleplay', 'about'];
 
-                const game = item.dataset.game;
+document.querySelectorAll('.game-item').forEach(item => {
+    item.addEventListener('click', () => {
+        // sidebar active
+        document.querySelectorAll('.game-item').forEach(i =>
+            i.classList.remove('active')
+        );
+        item.classList.add('active');
 
-                document.getElementById('main').classList.remove('active');
-                document.getElementById('tictactoe').style.display = 'none';
-                document.getElementById('trivia').classList.remove('active');
-                document.getElementById('roleplay').classList.remove('active');
-                document.getElementById('about').classList.remove('active');
+        // hide all pages
+        pages.forEach(p =>
+            document.getElementById(p).classList.remove('active')
+        );
 
-                if (game === 'main') {
-                    document.getElementById('main').classList.add('active');
-                } else if (game === 'tictactoe') {
-                    document.getElementById('tictactoe').style.display = 'block';
-                } else if (game === 'trivia') {
-                    document.getElementById('trivia').classList.add('active');
-                    resetTriviaGame();
-                    loadTriviaQuestion();
-                } else if (game === 'roleplay') {
-                    document.getElementById('roleplay').classList.add('active');
-                    if (!currentCharacter) {
-                        document.getElementById('character-input-section').style.display = 'block';
-                        document.getElementById('chat-container').classList.remove('active');
-                    }
-                } else if (game === 'about') {
-                    document.getElementById('about').classList.add('active');
-                }
-            });
-        });
+        // show selected page
+        const page = item.dataset.game;
+        document.getElementById(page).classList.add('active');
+
+        // page specific logic
+        if (page === 'trivia') {
+            resetTriviaGame();
+            loadTriviaQuestion();
+        }
+
+        if (page === 'roleplay' && !currentCharacter) {
+            document.getElementById('character-input-section').style.display = 'block';
+            document.getElementById('chat-container').classList.remove('active');
+        }
+    });
+});
+
 
         document.querySelectorAll('.game-link-btn').forEach(btn => {
             btn.addEventListener('click', () => {
