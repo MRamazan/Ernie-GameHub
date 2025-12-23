@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, send_file
 from flask_cors import CORS
 from gradio_client import Client
 import os
@@ -229,10 +229,107 @@ def trivia():
         return jsonify({"error": str(e)})
 
 
+roleplay_history = {}
+
+
+@app.route('/api/roleplay/start', methods=['POST'])
+def start_roleplay():
+    data = request.json
+    character = data.get('character', '')
+    session_id = data.get('session_id', 'default')
+
+    roleplay_history[session_id] = []
+
+    system_prompt = f"""You are now roleplaying as {character}.
+
+RULES:
+- Stay in character at ALL times
+- Use the character's personality, speech patterns, and mannerisms
+- Reference events, relationships, and knowledge from their universe
+- React as the character would react
+- Use their catchphrases or signature expressions when appropriate
+- Keep responses conversational and engaging (2-4 sentences usually)
+- Never break character or mention you're an AI
+
+Begin the conversation by greeting the user as {character} would!"""
+
+    try:
+        result = client.predict(
+            query=system_prompt,
+            chatbot=[],
+            file_url=[],
+            search_state=False,
+            api_name="/partial"
+        )
+
+        greeting = result[0][-1]["content"].strip()
+        roleplay_history[session_id].append({"role": "assistant", "content": greeting})
+
+        return jsonify({
+            "success": True,
+            "message": greeting,
+            "character": character
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
+
+@app.route('/api/roleplay/chat', methods=['POST'])
+def roleplay_chat():
+    data = request.json
+    user_message = data.get('message', '')
+    character = data.get('character', '')
+    session_id = data.get('session_id', 'default')
+
+    if session_id not in roleplay_history:
+        roleplay_history[session_id] = []
+
+    roleplay_history[session_id].append({"role": "user", "content": user_message})
+
+    # Build context from history
+    context = f"You are {character}. Continue the conversation naturally.\n\nConversation history:\n"
+    for msg in roleplay_history[session_id][-6:]:  # Last 6 messages for context
+        role = "User" if msg["role"] == "user" else character
+        context += f"{role}: {msg['content']}\n"
+
+    context += f"\nRespond as {character} would (stay in character):"
+
+    try:
+        result = client.predict(
+            query=context,
+            chatbot=[],
+            file_url=[],
+            search_state=False,
+            api_name="/partial"
+        )
+
+        response = result[0][-1]["content"].strip()
+        roleplay_history[session_id].append({"role": "assistant", "content": response})
+
+        return jsonify({
+            "success": True,
+            "message": response
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
+
+@app.route('/api/roleplay/clear', methods=['POST'])
+def clear_roleplay():
+    data = request.json
+    session_id = data.get('session_id', 'default')
+
+    if session_id in roleplay_history:
+        del roleplay_history[session_id]
+
+    return jsonify({"success": True})
+
 
 @app.route('/static/<path:path>')
 def send_static(path):
     return send_from_directory('static', path)
+
+
 
 
 if __name__ == '__main__':
