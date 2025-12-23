@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Hub</title>
+    <title>Ernie GameHub</title>
     <style>
         * {
             margin: 0;
@@ -23,6 +23,7 @@
             background: white;
             box-shadow: 4px 0 12px rgba(255, 140, 0, 0.1);
             padding: 32px 24px;
+            overflow-y: auto;
         }
 
         .logo {
@@ -61,6 +62,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
         }
 
         .game-container {
@@ -192,9 +194,295 @@
             display: block;
         }
 
+        .roleplay-container {
+            display: none;
+        }
+
+        .roleplay-container.active {
+            display: block;
+        }
+
+        .main-page-container {
+            display: none;
+            text-align: center;
+        }
+
+        .main-page-container.active {
+            display: block;
+        }
+
+        .main-page-title {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff8c00 0%, #ff6b00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 24px;
+        }
+
+        .main-page-description {
+            font-size: 18px;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 48px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .game-links {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .game-link-btn {
+            padding: 20px 32px;
+            background: linear-gradient(135deg, #ff8c00 0%, #ff6b00 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .game-link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+        }
+
+        .game-link-btn::after {
+            content: '→';
+            font-size: 24px;
+        }
+
+        .about-container {
+            display: none;
+        }
+
+        .about-container.active {
+            display: block;
+        }
+
+        .about-text {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 32px;
+        }
+
+        .about-link {
+            display: inline-block;
+            color: #ff8c00;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+        }
+
+        .about-link:hover {
+            color: #ff6b00;
+            text-decoration: underline;
+        }
+
+        .contact-section {
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .contact-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            color: #666;
+        }
+
+        .contact-item a {
+            color: #ff8c00;
+            text-decoration: none;
+            margin-left: 8px;
+        }
+
+        .contact-item a:hover {
+            text-decoration: underline;
+        }
+
+        .character-input-section {
+            margin-bottom: 32px;
+        }
+
+        .character-input {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .character-input:focus {
+            outline: none;
+            border-color: #ff8c00;
+            background: #fff5e6;
+        }
+
+        .start-roleplay-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ff8c00 0%, #ff6b00 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .start-roleplay-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+        }
+
+        .start-roleplay-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .chat-container {
+            display: none;
+        }
+
+        .chat-container.active {
+            display: block;
+        }
+
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f8f8;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            border: 3px solid #e0e0e0;
+        }
+
+        .chat-message {
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .chat-message.user {
+            background: linear-gradient(135deg, #ff8c00 0%, #ff6b00 100%);
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .chat-message.assistant {
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #333;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 14px;
+            font-size: 16px;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #ff8c00;
+            background: #fff5e6;
+        }
+
+        .send-btn {
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #ff8c00 0%, #ff6b00 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .chat-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .clear-chat-btn {
+            flex: 1;
+            padding: 12px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .clear-chat-btn:hover {
+            background: #d32f2f;
+        }
+
+        .character-display {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: #fff5e6;
+            border-radius: 12px;
+            font-weight: 600;
+            color: #ff8c00;
+        }
+
         .question-box {
             padding: 32px;
-            bottom-margin: 8px;
             text-align: center;
             font-size: 20px;
             font-weight: 600;
@@ -241,14 +529,6 @@
             cursor: not-allowed;
         }
 
-        .score {
-            text-align: center;
-            font-size: 18px;
-            font-weight: 600;
-            color: #ff8c00;
-            margin-bottom: 24px;
-        }
-
         .score-container {
             display: flex;
             justify-content: space-around;
@@ -291,6 +571,23 @@
             font-weight: 600;
         }
 
+        .explanation-box {
+            background: #fff5e6;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .explanation-box strong {
+            color: #ff8c00;
+            display: block;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
         .celebration {
             position: fixed;
             top: 0;
@@ -300,23 +597,6 @@
             pointer-events: none;
             z-index: 1000;
         }
-
-        .explanation-box {
-    background: #fff5e6;
-    padding: 20px;
-    border-radius: 12px;
-    margin: 20px 0;
-    font-size: 15px;
-    line-height: 1.6;
-    color: #333;
-}
-
-.explanation-box strong {
-    color: #ff8c00;
-    display: block;
-    margin-bottom: 20px;
-    font-size: 16px;
-}
 
         .confetti {
             position: absolute;
@@ -438,22 +718,50 @@
 <body>
     <div class="sidebar">
         <div class="logo">Ernie GameHub</div>
-        <div class="game-item active" data-game="tictactoe">
+        <div class="game-item active" data-game="main">
+            <span class="game-name">Main</span>
+        </div>
+        <div class="game-item" data-game="tictactoe">
             <span class="game-name">Tic Tac Toe</span>
         </div>
         <div class="game-item" data-game="trivia">
             <span class="game-name">Two Truths One Lie</span>
+        </div>
+        <div class="game-item" data-game="roleplay">
+            <span class="game-name">Role Play</span>
+        </div>
+        <div class="game-item" data-game="about">
+            <span class="game-name">About</span>
         </div>
     </div>
 
     <div class="main-content">
         <div class="lang-selector">
             <button class="lang-btn active" data-lang="en">EN</button>
-            <button class="lang-btn" data-lang="tr">TR</button>
             <button class="lang-btn" data-lang="zh">中文</button>
         </div>
 
         <div class="game-container">
+            <div id="main" class="main-page-container active">
+                <div class="game-header">
+                    <h1 class="main-page-title">Welcome to Ernie GameHub</h1>
+                    <p class="main-page-description">
+                        Experience the power of AI gaming with Ernie AI. Play interactive games, challenge yourself with trivia, and engage in roleplay conversations with your favorite characters.
+                    </p>
+                </div>
+                <div class="game-links">
+                    <button class="game-link-btn" data-target="tictactoe">
+                        <span>Tic Tac Toe</span>
+                    </button>
+                    <button class="game-link-btn" data-target="trivia">
+                        <span>Two Truths One Lie</span>
+                    </button>
+                    <button class="game-link-btn" data-target="roleplay">
+                        <span>Role Play Chat</span>
+                    </button>
+                </div>
+            </div>
+
             <div id="tictactoe" class="tictactoe-container">
                 <div class="game-header">
                     <h1 class="game-title">Tic Tac Toe</h1>
@@ -498,6 +806,67 @@
                 <div class="explanation-box" id="explanation" style="display: none;"></div>
                 <button class="reset-btn" id="next-question">Next Round</button>
             </div>
+
+            <div id="roleplay" class="roleplay-container">
+                <div class="game-header">
+                    <h1 class="game-title">Role Play Chat</h1>
+                    <p class="game-subtitle">Chat with your favorite characters</p>
+                </div>
+
+                <div class="character-input-section" id="character-input-section">
+                    <input
+                        type="text"
+                        class="character-input"
+                        id="character-input"
+                        placeholder='e.g. "Luffy from One Piece"'
+                    />
+                    <button class="start-roleplay-btn" id="start-roleplay-btn">Start Chat</button>
+                </div>
+
+                <div class="chat-container" id="chat-container">
+                    <div class="character-display" id="character-display"></div>
+                    <div class="chat-messages" id="chat-messages"></div>
+                    <div class="chat-input-area">
+                        <input
+                            type="text"
+                            class="chat-input"
+                            id="chat-input"
+                            placeholder="Type your message..."
+                        />
+                        <button class="send-btn" id="send-btn">Send</button>
+                    </div>
+                    <div class="chat-controls">
+                        <button class="clear-chat-btn" id="clear-chat-btn">Clear Chat & Change Character</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="about" class="about-container">
+                <div class="game-header">
+                    <h1 class="game-title">About This Project</h1>
+                </div>
+                <div class="about-text">
+                    <p style="margin-bottom: 20px;">
+                        This project was created for the <strong>Ernie AI Developer Challenge</strong> hackathon, showcasing the capabilities of Ernie AI in creating engaging and interactive gaming experiences.
+                    </p>
+                    <p style="margin-bottom: 20px;">
+                        <a href="https://baiduernieai.devpost.com" target="_blank" class="about-link">
+                            🏆 View Hackathon Details
+                        </a>
+                    </p>
+                </div>
+                <div class="contact-section">
+                    <h3 class="contact-title">Get in Touch</h3>
+                    <div class="contact-item">
+                        <strong>GitHub:</strong>
+                        <a href="https://github.com/yourusername" target="_blank">github.com/yourusername</a>
+                    </div>
+                    <div class="contact-item">
+                        <strong>Email:</strong>
+                        <a href="mailto:your.email@gmail.com">your.email@gmail.com</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -507,18 +876,26 @@
 
         const translations = {
             en: {
+                main: 'Main',
                 tictactoe: 'Tic Tac Toe',
                 trivia: 'Two Truths One Lie',
+                roleplay: 'Role Play',
+                about: 'About',
+                welcomeTitle: 'Welcome to Ernie GameHub',
+                welcomeDesc: 'Experience the power of AI gaming with Ernie AI. Play interactive games, challenge yourself with trivia, and engage in roleplay conversations with your favorite characters.',
+                aboutTitle: 'About This Project',
+                aboutText: 'This project was created for the <strong>Ernie AI Developer Challenge</strong> hackathon, showcasing the capabilities of Ernie AI in creating engaging and interactive gaming experiences.',
+                hackathonLink: '🏆 View Hackathon Details',
+                contactTitle: 'Get in Touch',
                 playAgainstAI: 'Play against AI',
                 findFalse: 'Find the false statement',
+                chatWithCharacters: 'Chat with your favorite characters',
                 yourTurn: 'Your turn',
                 aiThinking: 'Ernie is thinking...',
                 youWin: 'You win!',
                 aiWins: 'Ernie wins!',
                 draw: 'Draw!',
                 newGame: 'New Game',
-                score: 'Score',
-                nextQuestion: 'Next Question',
                 nextRound: 'Next Round',
                 loading: 'Loading...',
                 whichFalse: 'Which statement is false?',
@@ -527,44 +904,34 @@
                 ai: 'AI',
                 gameOver: 'Game Over!',
                 finalScore: 'Final Score',
-                playAgain: 'Play Again'
-            },
-            tr: {
-                tictactoe: 'Tic Tac Toe',
-                trivia: '2 Doğru 1 Yanlış',
-                playAgainstAI: 'Yapay zeka ile oyna',
-                findFalse: 'Yanlış ifadeyi bul',
-                yourTurn: 'Senin sıran',
-                aiThinking: 'Ernie düşünüyor...',
-                youWin: 'Kazandın!',
-                aiWins: 'Ernie kazandı!',
-                draw: 'Berabere!',
-                newGame: 'Yeni Oyun',
-                score: 'Skor',
-                nextQuestion: 'Sonraki Soru',
-                nextRound: 'Sonraki Tur',
-                loading: 'Yükleniyor...',
-                whichFalse: 'Hangi ifade yanlış?',
-                round: 'Tur',
-                you: 'Sen',
-                ai: 'AI',
-                gameOver: 'Oyun Bitti!',
-                finalScore: 'Final Skoru',
-                playAgain: 'Tekrar Oyna'
+                playAgain: 'Play Again',
+                enterCharacter: 'e.g. "Luffy from One Piece"',
+                startChat: 'Start Chat',
+                typeMessage: 'Type your message...',
+                send: 'Send',
+                clearChat: 'Clear Chat & Change Character'
             },
             zh: {
+                main: '主页',
                 tictactoe: '井字棋',
                 trivia: '两真一假',
+                roleplay: '角色扮演',
+                about: '关于',
+                welcomeTitle: '欢迎来到Ernie游戏中心',
+                welcomeDesc: '体验Ernie AI的游戏力量。玩互动游戏，挑战琐事问答，并与你最喜欢的角色进行角色扮演对话。',
+                aboutTitle: '关于此项目',
+                aboutText: '此项目是为<strong>Ernie AI开发者挑战赛</strong>黑客松创建的，展示了Ernie AI在创建引人入胜的互动游戏体验方面的能力。',
+                hackathonLink: '🏆 查看黑客松详情',
+                contactTitle: '联系方式',
                 playAgainstAI: '与Ernie对战',
                 findFalse: '找出错误的陈述',
+                chatWithCharacters: '与你喜欢的角色聊天',
                 yourTurn: '你的回合',
                 aiThinking: 'Ernie思考中...',
                 youWin: '你赢了！',
                 aiWins: 'Ernie赢了！',
                 draw: '平局！',
                 newGame: '新游戏',
-                score: '分数',
-                nextQuestion: '下一题',
                 nextRound: '下一轮',
                 loading: '加载中...',
                 whichFalse: '哪个陈述是错误的？',
@@ -573,7 +940,12 @@
                 ai: 'AI',
                 gameOver: '游戏结束！',
                 finalScore: '最终得分',
-                playAgain: '再玩一次'
+                playAgain: '再玩一次',
+                enterCharacter: '例如："海贼王的路飞"',
+                startChat: '开始聊天',
+                typeMessage: '输入你的消息...',
+                send: '发送',
+                clearChat: '清除聊天并更换角色'
             }
         };
 
@@ -584,20 +956,98 @@
         let aiScore = 0;
         let currentRound = 1;
         let maxRounds = 5;
+        let currentCharacter = '';
+        let sessionId = 'session_' + Date.now();
 
         function updateLanguage() {
             const t = translations[currentLang];
-            document.querySelectorAll('.game-name')[0].textContent = t.tictactoe;
-            document.querySelectorAll('.game-name')[1].textContent = t.trivia;
-            document.querySelector('#tictactoe .game-title').textContent = t.tictactoe;
-            document.querySelector('#tictactoe .game-subtitle').textContent = t.playAgainstAI;
-            document.querySelector('#trivia .game-title').textContent = t.trivia;
-            document.querySelector('#trivia .game-subtitle').textContent = t.findFalse;
-            document.querySelector('#tictactoe .reset-btn').textContent = t.newGame;
-            document.querySelector('#next-question').textContent = t.nextQuestion;
 
-            if (gameActive) {
-                document.querySelector('.status').textContent = t.yourTurn;
+            const gameItems = document.querySelectorAll('.game-item .game-name');
+            if (gameItems[0]) gameItems[0].textContent = t.main;
+            if (gameItems[1]) gameItems[1].textContent = t.tictactoe;
+            if (gameItems[2]) gameItems[2].textContent = t.trivia;
+            if (gameItems[3]) gameItems[3].textContent = t.roleplay;
+            if (gameItems[4]) gameItems[4].textContent = t.about;
+
+            const mainTitle = document.querySelector('#main .main-page-title');
+            if (mainTitle) mainTitle.textContent = t.welcomeTitle;
+
+            const mainDesc = document.querySelector('#main .main-page-description');
+            if (mainDesc) mainDesc.textContent = t.welcomeDesc;
+
+            const gameLinkBtns = document.querySelectorAll('.game-link-btn span');
+            if (gameLinkBtns[0]) gameLinkBtns[0].textContent = t.tictactoe;
+            if (gameLinkBtns[1]) gameLinkBtns[1].textContent = t.trivia;
+            if (gameLinkBtns[2]) gameLinkBtns[2].textContent = t.roleplay;
+
+            const aboutTitle = document.querySelector('#about .game-title');
+            if (aboutTitle) aboutTitle.textContent = t.aboutTitle;
+
+            const aboutText = document.querySelector('#about .about-text p');
+            if (aboutText) aboutText.innerHTML = t.aboutText;
+
+            const hackathonLink = document.querySelector('#about .about-link');
+            if (hackathonLink) hackathonLink.textContent = t.hackathonLink;
+
+            const contactTitle = document.querySelector('#about .contact-title');
+            if (contactTitle) contactTitle.textContent = t.contactTitle;
+
+            const tttTitle = document.querySelector('#tictactoe .game-title');
+            if (tttTitle) tttTitle.textContent = t.tictactoe;
+
+            const tttSubtitle = document.querySelector('#tictactoe .game-subtitle');
+            if (tttSubtitle) tttSubtitle.textContent = t.playAgainstAI;
+
+            const tttResetBtn = document.querySelector('#tictactoe .reset-btn');
+            if (tttResetBtn) tttResetBtn.textContent = t.newGame;
+
+            const triviaTitle = document.querySelector('#trivia .game-title');
+            if (triviaTitle) triviaTitle.textContent = t.trivia;
+
+            const triviaSubtitle = document.querySelector('#trivia .game-subtitle');
+            if (triviaSubtitle) triviaSubtitle.textContent = t.findFalse;
+
+            const nextQuestion = document.getElementById('next-question');
+            if (nextQuestion) nextQuestion.textContent = t.nextRound;
+
+            const playerLabel = document.querySelector('.score-box.player .score-label');
+            if (playerLabel) playerLabel.textContent = t.you;
+
+            const aiLabel = document.querySelector('.score-box.ai .score-label');
+            if (aiLabel) aiLabel.textContent = t.ai;
+
+            const roundInfo = document.querySelector('.round-info');
+            if (roundInfo) {
+                const roundSpan = document.getElementById('current-round');
+                if (roundSpan) {
+                    roundInfo.innerHTML = `${t.round} <span id="current-round">${roundSpan.textContent}</span> / 5`;
+                }
+            }
+
+            const roleplayTitle = document.querySelector('#roleplay .game-title');
+            if (roleplayTitle) roleplayTitle.textContent = t.roleplay;
+
+            const roleplaySubtitle = document.querySelector('#roleplay .game-subtitle');
+            if (roleplaySubtitle) roleplaySubtitle.textContent = t.chatWithCharacters;
+
+            const charInput = document.querySelector('#character-input');
+            if (charInput) charInput.placeholder = t.enterCharacter;
+
+            const startBtn = document.querySelector('#start-roleplay-btn');
+            if (startBtn) startBtn.textContent = t.startChat;
+
+            const chatInput = document.querySelector('#chat-input');
+            if (chatInput) chatInput.placeholder = t.typeMessage;
+
+            const sendBtn = document.querySelector('#send-btn');
+            if (sendBtn) sendBtn.textContent = t.send;
+
+            const clearBtn = document.querySelector('#clear-chat-btn');
+            if (clearBtn) clearBtn.textContent = t.clearChat;
+
+            const status = document.querySelector('.status');
+            if (gameActive && status) {
+                status.textContent = t.yourTurn;
             }
         }
 
@@ -616,14 +1066,39 @@
                 item.classList.add('active');
 
                 const game = item.dataset.game;
-                if (game === 'tictactoe') {
+
+                document.getElementById('main').classList.remove('active');
+                document.getElementById('tictactoe').style.display = 'none';
+                document.getElementById('trivia').classList.remove('active');
+                document.getElementById('roleplay').classList.remove('active');
+                document.getElementById('about').classList.remove('active');
+
+                if (game === 'main') {
+                    document.getElementById('main').classList.add('active');
+                } else if (game === 'tictactoe') {
                     document.getElementById('tictactoe').style.display = 'block';
-                    document.getElementById('trivia').classList.remove('active');
-                } else {
-                    document.getElementById('tictactoe').style.display = 'none';
+                } else if (game === 'trivia') {
                     document.getElementById('trivia').classList.add('active');
                     resetTriviaGame();
                     loadTriviaQuestion();
+                } else if (game === 'roleplay') {
+                    document.getElementById('roleplay').classList.add('active');
+                    if (!currentCharacter) {
+                        document.getElementById('character-input-section').style.display = 'block';
+                        document.getElementById('chat-container').classList.remove('active');
+                    }
+                } else if (game === 'about') {
+                    document.getElementById('about').classList.add('active');
+                }
+            });
+        });
+
+        document.querySelectorAll('.game-link-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.dataset.target;
+                const targetItem = document.querySelector(`.game-item[data-game="${target}"]`);
+                if (targetItem) {
+                    targetItem.click();
                 }
             });
         });
@@ -713,104 +1188,100 @@
         });
 
         document.querySelector('#tictactoe .reset-btn').addEventListener('click', () => {
-    board = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '];
-    gameActive = true;
+            board = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '];
+            gameActive = true;
 
-    document.querySelectorAll('.cell').forEach(cell => {
-        cell.textContent = '';
-        cell.classList.remove('taken');
-    });
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.textContent = '';
+                cell.classList.remove('taken');
+            });
 
+            startingPlayer = startingPlayer === 'X' ? 'O' : 'X';
 
-    startingPlayer = startingPlayer === 'X' ? 'O' : 'X';
-
-    if (startingPlayer === 'X') {
-        document.querySelector('.status').textContent = translations[currentLang].yourTurn;
-    } else {
-        document.querySelector('.status').textContent = translations[currentLang].aiThinking;
-
-        setTimeout(aiMove, 400);
-    }
-});
-
+            if (startingPlayer === 'X') {
+                document.querySelector('.status').textContent = translations[currentLang].yourTurn;
+            } else {
+                document.querySelector('.status').textContent = translations[currentLang].aiThinking;
+                setTimeout(aiMove, 400);
+            }
+        });
 
         async function loadTriviaQuestion() {
-    const t = translations[currentLang];
-    document.getElementById('question').textContent = "Ernie is generating statements...";
-    document.getElementById('explanation').style.display = 'none';
+            const t = translations[currentLang];
+            document.getElementById('question').textContent = "Ernie is generating statements...";
+            document.getElementById('explanation').style.display = 'none';
 
-    const answerBtns = document.querySelectorAll('.answer-btn');
-    answerBtns.forEach(btn => {
-        btn.textContent = '';
-        btn.disabled = true;
-        btn.classList.remove('correct', 'wrong');
-    });
-
-    const nextBtn = document.getElementById('next-question');
-    nextBtn.disabled = true;
-
-    try {
-        const response = await fetch(`${API_BASE}/trivia`);
-        const data = await response.json();
-
-        if (data.statements) {
-            document.getElementById('question').textContent = t.whichFalse;
-
-            answerBtns.forEach((btn, idx) => {
-                btn.textContent = data.statements[idx];
-                btn.disabled = false;
-                btn.onclick = () => checkAnswer(idx, data.lie, data.explanation); // explanation ekledik
+            const answerBtns = document.querySelectorAll('.answer-btn');
+            answerBtns.forEach(btn => {
+                btn.textContent = '';
+                btn.disabled = true;
+                btn.classList.remove('correct', 'wrong');
             });
-        } else {
-            document.getElementById('question').textContent = 'Error loading question';
+
+            const nextBtn = document.getElementById('next-question');
+            nextBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/trivia`);
+                const data = await response.json();
+
+                if (data.statements) {
+                    document.getElementById('question').textContent = t.whichFalse;
+
+                    answerBtns.forEach((btn, idx) => {
+                        btn.textContent = data.statements[idx];
+                        btn.disabled = false;
+                        btn.onclick = () => checkAnswer(idx, data.lie, data.explanation);
+                    });
+                } else {
+                    document.getElementById('question').textContent = 'Error loading question';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('question').textContent = 'Error loading question';
+            } finally {
+                nextBtn.disabled = false;
+            }
         }
-    } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('question').textContent = 'Error loading question';
-    } finally {
-        nextBtn.disabled = false;
-    }
-}
 
         function checkAnswer(selected, correct, explanation) {
-    const t = translations[currentLang];
-    const buttons = document.querySelectorAll('.answer-btn');
+            const t = translations[currentLang];
+            const buttons = document.querySelectorAll('.answer-btn');
 
-    buttons.forEach((btn, idx) => {
-        btn.disabled = true;
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
 
-        if (idx === correct) {
-            btn.classList.add('wrong');
-        } else {
-            btn.classList.add('correct');
-        }
-    });
+                if (idx === correct) {
+                    btn.classList.add('wrong');
+                } else {
+                    btn.classList.add('correct');
+                }
+            });
 
+            const explanationBox = document.getElementById('explanation');
+            explanationBox.innerHTML = `<strong>Explanation:</strong> ${explanation || 'No explanation available.'}`;
+            explanationBox.style.display = 'block';
 
-    const explanationBox = document.getElementById('explanation');
-    explanationBox.innerHTML = `<strong>Explanation:</strong> ${explanation || 'No explanation available.'}`;
-    explanationBox.style.display = 'block';
-
-    if (selected === correct) {
-        playerScore++;
-        document.getElementById('player-score').textContent = playerScore;
-    } else {
-        aiScore++;
-        document.getElementById('ai-score').textContent = aiScore;
-    }
-
-    if (currentRound >= maxRounds) {
-        setTimeout(() => {
-            if (playerScore > aiScore) {
-                showWinModal(t.youWin, `${t.finalScore}: ${playerScore} - ${aiScore}`, t.playAgain);
-            } else if (aiScore > playerScore) {
-                showLoseModal(t.aiWins, `${t.finalScore}: ${playerScore} - ${aiScore}`, t.playAgain);
+            if (selected === correct) {
+                playerScore++;
+                document.getElementById('player-score').textContent = playerScore;
             } else {
-                showDrawModal(t.draw, `${t.finalScore}: ${playerScore} - ${aiScore}`, t.playAgain);
+                aiScore++;
+                document.getElementById('ai-score').textContent = aiScore;
             }
-        }, 1500);
-    }
-}
+
+            if (currentRound >= maxRounds) {
+                setTimeout(() => {
+                    if (playerScore > aiScore) {
+                        showWinModal(t.youWin, `${t.finalScore}: ${playerScore} - ${aiScore}`, t.playAgain);
+                    } else if (aiScore > playerScore) {
+                        showLoseModal(t.aiWins, `${t.finalScore}: ${playerScore} - ${aiScore}`, t.playAgain);
+                    } else {
+                        showDrawModal(t.draw, `${t.finalScore}: ${playerScore} - ${aiScore}`, t.playAgain);
+                    }
+                }, 1500);
+            }
+        }
 
         document.getElementById('next-question').addEventListener('click', () => {
             if (currentRound >= maxRounds) {
@@ -832,6 +1303,106 @@
             document.getElementById('ai-score').textContent = aiScore;
             loadTriviaQuestion();
         }
+
+        document.getElementById('start-roleplay-btn').addEventListener('click', async () => {
+            const character = document.getElementById('character-input').value.trim();
+            if (!character) return;
+
+            currentCharacter = character;
+            const btn = document.getElementById('start-roleplay-btn');
+            btn.disabled = true;
+            btn.textContent = 'Starting...';
+
+            try {
+                const response = await fetch(`${API_BASE}/roleplay/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ character, session_id: sessionId })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('character-input-section').style.display = 'none';
+                    document.getElementById('chat-container').classList.add('active');
+                    document.getElementById('character-display').textContent = `Chatting with: ${character}`;
+
+                    const messagesDiv = document.getElementById('chat-messages');
+                    messagesDiv.innerHTML = `<div class="chat-message assistant">${data.message}</div>`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to start roleplay. Please try again.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = translations[currentLang].startChat;
+            }
+        });
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const messagesDiv = document.getElementById('chat-messages');
+            messagesDiv.innerHTML += `<div class="chat-message user">${message}</div>`;
+            input.value = '';
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            const sendBtn = document.getElementById('send-btn');
+            sendBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/roleplay/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message,
+                        character: currentCharacter,
+                        session_id: sessionId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    messagesDiv.innerHTML += `<div class="chat-message assistant">${data.message}</div>`;
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                messagesDiv.innerHTML += `<div class="chat-message assistant">Sorry, there was an error. Please try again.</div>`;
+            } finally {
+                sendBtn.disabled = false;
+            }
+        }
+
+        document.getElementById('send-btn').addEventListener('click', sendMessage);
+
+        document.getElementById('chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        document.getElementById('clear-chat-btn').addEventListener('click', async () => {
+            try {
+                await fetch(`${API_BASE}/roleplay/clear`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId })
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+
+            sessionId = 'session_' + Date.now();
+            currentCharacter = '';
+            document.getElementById('character-input').value = '';
+            document.getElementById('chat-messages').innerHTML = '';
+            document.getElementById('character-input-section').style.display = 'block';
+            document.getElementById('chat-container').classList.remove('active');
+        });
 
         function createConfetti() {
             const colors = ['#ff8c00', '#ff6b00', '#ffa500', '#ffb347', '#ffd700'];
@@ -916,7 +1487,6 @@
                 resetTriviaGame();
             }
         }
-
     </script>
 </body>
 </html>
