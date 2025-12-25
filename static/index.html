@@ -1263,43 +1263,52 @@ document.querySelectorAll('.game-item').forEach(item => {
         }
 
         function checkAnswer(selected, correct, explanation) {
-            const t = translations[currentLang];
-            const buttons = document.querySelectorAll('.answer-btn');
+    const t = translations[currentLang];
+    const buttons = document.querySelectorAll('.answer-btn');
+    const nextBtn = document.getElementById('next-question');
 
-            buttons.forEach((btn, idx) => {
-                btn.disabled = true;
+    
+    nextBtn.disabled = true;
 
-                if (idx === correct) {
-                    btn.classList.add('wrong');
-                } else {
-                    btn.classList.add('correct');
-                }
-            });
+    buttons.forEach((btn, idx) => {
+        btn.disabled = true;
 
-            const explanationBox = document.getElementById('explanation');
-            explanationBox.innerHTML = `<strong>Explanation:</strong> ${explanation || 'No explanation available.'}`;
-            explanationBox.style.display = 'block';
-
-            if (selected === correct) {
-                playerScore++;
-                document.getElementById('player-score').textContent = playerScore;
-            } else {
-                aiScore++;
-                document.getElementById('ai-score').textContent = aiScore;
-            }
-
-            if (currentRound >= maxRounds) {
-                setTimeout(() => {
-                    if (playerScore > aiScore) {
-                        showWinModal(t.youWin, `${t.finalScore}: ${playerScore} - ${aiScore}`, t.playAgain);
-                    } else if (aiScore > playerScore) {
-                        showLoseModal(t.aiWins, `${t.finalScore}: ${playerScore} - ${aiScore}`, t.playAgain);
-                    } else {
-                        showDrawModal(t.draw, `${t.finalScore}: ${playerScore} - ${aiScore}`, t.playAgain);
-                    }
-                }, 1500);
-            }
+        if (idx === correct) {
+            btn.classList.add('wrong');
+        } else {
+            btn.classList.add('correct');
         }
+    });
+
+    const explanationBox = document.getElementById('explanation');
+    explanationBox.innerHTML = `<strong>Explanation:</strong> ${explanation || 'No explanation available.'}`;
+    explanationBox.style.display = 'block';
+
+    if (selected === correct) {
+        playerScore++;
+        document.getElementById('player-score').textContent = playerScore;
+    } else {
+        aiScore++;
+        document.getElementById('ai-score').textContent = aiScore;
+    }
+
+   
+    setTimeout(() => {
+        nextBtn.disabled = false;
+    }, 800);
+
+    if (currentRound >= maxRounds) {
+        setTimeout(() => {
+            if (playerScore > aiScore) {
+                showWinModal(t.youWin, `${t.finalScore}: ${playerScore} - ${aiScore}`, t.playAgain);
+            } else if (aiScore > playerScore) {
+                showLoseModal(t.aiWins, `${t.finalScore}: ${playerScore} - ${aiScore}`, t.playAgain);
+            } else {
+                showDrawModal(t.draw, `${t.finalScore}: ${playerScore} - ${aiScore}`, t.playAgain);
+            }
+        }, 1500);
+    }
+}
 
         document.getElementById('next-question').addEventListener('click', () => {
             if (currentRound >= maxRounds) {
